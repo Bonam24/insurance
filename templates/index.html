@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direct vs Recaptured Images Analyzer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --dark-bg: #121212;
+            --darker-bg: #0a0a0a;
+            --light-text: #f8f9fa;
+            --accent-red: #ff4d4d;
+            --accent-green: #4dff88;
+            --accent-blue: #4da6ff;
+            --accent-purple: #a64dff;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: var(--light-text);
+            padding-top: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .navbar-brand img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--darker-bg), #1a1a2e);
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #333;
+        }
+        
+        .container {
+            max-width: 800px;
+        }
+        
+        .card {
+            background-color: var(--darker-bg);
+            border: 1px solid #333;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .image-preview {
+            max-width: 100%;
+            max-height: 400px;
+            margin: 1rem auto;
+            border: 2px solid #333;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .prediction-result {
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .screen { color: var(--accent-red); }
+        .camera { color: var(--accent-green); }
+        
+        .btn-primary {
+            background-color: var(--accent-blue);
+            border: none;
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background-color: #3a8de0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .accordion-button {
+            background-color: #1e1e1e;
+            color: var(--light-text);
+            font-weight: 500;
+        }
+        
+        .accordion-button:not(.collapsed) {
+            background-color: #252525;
+            color: var(--light-text);
+        }
+        
+        .accordion-body {
+            background-color: #1a1a1a;
+        }
+        
+        .badge {
+            font-weight: 500;
+            padding: 0.5em 0.8em;
+        }
+        
+        .bg-danger { background-color: var(--accent-red)!important; }
+        .bg-success { background-color: var(--accent-green)!important; }
+        
+        .confidence-badge {
+            font-size: 0.9rem;
+            margin-right: 8px;
+            border-radius: 12px;
+        }
+        
+        .upload-section {
+            background-color: #1a1a1a;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            border: 1px dashed #444;
+        }
+        
+        .form-control {
+            background-color: #252525;
+            border: 1px solid #444;
+            color: var(--light-text);
+            padding: 0.8rem;
+        }
+        
+        .form-control:focus {
+            background-color: #2d2d2d;
+            border-color: var(--accent-blue);
+            color: var(--light-text);
+            box-shadow: 0 0 0 0.25rem rgba(77, 166, 255, 0.25);
+        }
+        
+        .alert {
+            border-radius: 8px;
+        }
+        
+        .tech-badge {
+            background-color: #333;
+            color: var(--accent-blue);
+            font-family: monospace;
+            margin-right: 5px;
+        }
+        
+        /* Logo and branding styles */
+        .brand-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .brand-logo {
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .brand-name {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--light-text);
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <!-- DeepTrack Foundry Branding -->
+    <div class="brand-container">
+        <img src="static/uploads/deeptrack-high-resolution-logo-transparent.png" alt="DeepTrack Foundry Logo" class="brand-logo">
+        <span class="brand-name">deeptrack Foundry</span>
+    </div>
+
+    <div class="header text-center mt-4">
+        <div class="container">
+            <h1 class="display-4 mb-3">DIRECT vs RECAPTURED IMAGES</h1>
+            <p class="lead">Advanced moiré pattern detection using ensemble deep learning</p>
+            <div class="mt-3">
+                <span class="tech-badge badge">ViT Tiny</span>
+                <span class="tech-badge badge">5-Model Ensemble</span>
+                <span class="tech-badge badge">Threshold Analysis</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="upload-section text-center">
+            <h3 class="mb-4">Upload Image for Analysis</h3>
+            <form id="uploadForm" method="POST" action="/predict" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <input type="file" class="form-control" name="file" accept="image/*" required>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-cloud-arrow-up"></i> Analyze Image
+                </button>
+            </form>
+        </div>
+
+        {% if error %}
+            <div class="alert alert-danger mt-3">{{ error }}</div>
+        {% endif %}
+
+        {% if image_url %}
+            <div class="text-center">
+                <h4 class="mb-3">Uploaded Image Analysis</h4>
+                <img src="{{ image_url }}" class="image-preview">
+            </div>
+        {% endif %}
+
+        {% if prediction %}
+            <div class="text-center mt-4">
+                <h3>Final Detection Result:</h3>
+                <div class="prediction-result {{ prediction.final_prediction }} my-4">
+                    {{ prediction.final_prediction | upper }}
+                </div>
+                <p class="text-muted">
+                    {% if prediction.final_prediction == "screen" %}
+                        <i class="bi bi-exclamation-triangle-fill"></i> Moiré patterns detected
+                    {% else %}
+                        <i class="bi bi-check-circle-fill"></i> No moiré patterns detected
+                    {% endif %}
+                </p>
+            </div>
+            
+            <div class="mt-5">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">Model Predictions Breakdown</h4>
+                        
+                        <div class="accordion" id="modelAccordion">
+                            {% for model_name, model_pred in prediction.model_predictions.items() %}
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading{{ loop.index }}">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                            data-bs-target="#collapse{{ loop.index }}" aria-expanded="false" 
+                                            aria-controls="collapse{{ loop.index }}">
+                                        <span class="me-2">{{ model_pred.model_name }}</span>
+                                        <span class="badge bg-{% if model_pred.class == 'recaptured' %}danger{% else %}success{% endif %}">
+                                            {{ model_pred.class | capitalize }}
+                                            {% if model_name == 'moire' %} (Low Threshold){% endif %}
+                                        </span>
+                                    </button>
+                                </h2>
+                                <div id="collapse{{ loop.index }}" class="accordion-collapse collapse" 
+                                     aria-labelledby="heading{{ loop.index }}" data-bs-parent="#modelAccordion">
+                                    <div class="accordion-body">
+                                        {% if model_pred.error %}
+                                            <div class="alert alert-warning">{{ model_pred.error }}</div>
+                                        {% else %}
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="mb-3">
+                                                        <h6>Moiré Confidence:</h6>
+                                                        <div class="progress" style="height: 25px;">
+                                                            <div class="progress-bar bg-danger" 
+                                                                 role="progressbar" 
+                                                                 style="width: {{ model_pred.moire_confidence|float * 100 }}%" 
+                                                                 aria-valuenow="{{ model_pred.moire_confidence }}" 
+                                                                 aria-valuemin="0" 
+                                                                 aria-valuemax="1">
+                                                                {{ model_pred.moire_confidence }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="mb-3">
+                                                        <h6>Real Confidence:</h6>
+                                                        <div class="progress" style="height: 25px;">
+                                                            <div class="progress-bar bg-success" 
+                                                                 role="progressbar" 
+                                                                 style="width: {{ model_pred.real_confidence|float * 100 }}%" 
+                                                                 aria-valuenow="{{ model_pred.real_confidence }}" 
+                                                                 aria-valuemin="0" 
+                                                                 aria-valuemax="1">
+                                                                {{ model_pred.real_confidence }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mt-3">
+                                                <small class="text-muted">
+                                                    Threshold: <strong>{{ model_pred.threshold }}</strong>
+                                                    {% if model_name == 'moire' %} (special low threshold for moiré detection){% endif %}
+                                                </small>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h5>Decision Logic:</h5>
+                            <div class="alert alert-secondary">
+                                <ul class="mb-0">
+                                    <li>Final "<strong>RECAPTURED</strong>" verdict if <strong>any model</strong> detects moiré patterns above its threshold</li>
+                                    <li>Final "<strong>DIRECT</strong>" verdict only if <strong>all models</strong> agree the image is real</li>
+                                    <li>Moiré model uses special low threshold ({{ prediction.moire_threshold }}) for sensitive detection</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <footer class="mt-5 py-4 text-center text-muted">
+        <div class="container">
+            <small>Direct vs Recaptured Image Detection System by DeepTrack Foundry</small>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+</body>
+</html>
